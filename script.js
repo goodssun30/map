@@ -1,16 +1,21 @@
 "use strict"; // 厳格モードを適用（バグ防止）
 
-// 🔹 Firebaseの設定
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-app.js";
+import { getFirestore } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-firestore.js";
+
+// Firebaseの設定
 const firebaseConfig = {
-    apiKey: "AIzaSyAGpB4dwElJQvph-hEZ1Na5ztdE_4Ks0wY",
-    authDomain: "notion-map-1c0f8.firebaseapp.com",
-    projectId: "notion-map-1c0f8",
-    storageBucket: "notion-map-1c0f8.firebasestorage.app",
-    messagingSenderId: "694300884054",
-    appId: "1:694300884054:web:cfe8985cc0c27041f54ff7"
+    apiKey: "YOUR_API_KEY",
+    authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+    projectId: "YOUR_PROJECT_ID",
+    storageBucket: "YOUR_PROJECT_ID.appspot.com",
+    messagingSenderId: "YOUR_SENDER_ID",
+    appId: "YOUR_APP_ID"
 };
-firebase.initializeApp(firebaseConfig);
-const db = firebase.firestore();
+
+// Firebaseの初期化
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
 
 // 🔹 状態変更関数
 function getNextStatus(currentStatus) {
