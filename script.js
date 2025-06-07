@@ -35,8 +35,6 @@ function getNextStatus(currentStatus) {
     return currentIndex < statusFlow.length - 1 ? statusFlow[currentIndex + 1] : currentStatus;
 }
 
-import { collection, getDocs, getDoc, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-firestore.js";
-
 // 🔹 ページ読み込み時のデータ復元
 getDocs(collection(db, "prefectures")).then((querySnapshot) => {
     querySnapshot.forEach((docSnap) => {
