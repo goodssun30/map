@@ -13,18 +13,23 @@ const firebaseConfig = {
   appId: "1:694300884054:web:cfe8985cc0c27041f54ff7"
 };
 
+
 // 🔹 Firebaseの初期化
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-// 🔹 Firestoreの状態確認
+// 🔹 Firestore の状態確認
 console.log("Firestoreの状態:", db);
 
-// 🔹 ページ読み込み時のデータ復元（Firestoreからデータを取得）
+// 🔹 ページ読み込み時のデータ復元
 getDocs(collection(db, "prefectures")).then((querySnapshot) => {
     querySnapshot.forEach((docSnap) => {
-        const prefData = docSnap.data();
-        updateMapColor(docSnap.id, prefData.status);
+        if (docSnap.exists()) {
+            const prefData = docSnap.data();
+            updateMapColor(docSnap.id, prefData.status);
+        } else {
+            console.warn(`データが見つかりません: ${docSnap.id}`);
+        }
     });
 });
 
@@ -45,6 +50,8 @@ document.querySelectorAll(".prefecture").forEach((element) => {
         if (docSnap.exists()) {
             const currentStatus = docSnap.data().status;
             updateStatus(prefCode, currentStatus);
+        } else {
+            console.warn(`Firestoreのデータが見つかりません: ${prefCode}`);
         }
     });
 });
