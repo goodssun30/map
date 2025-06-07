@@ -5,7 +5,7 @@ import { getFirestore, collection, getDocs, getDoc, doc, updateDoc } from "https
 
 // 🔹 Firebaseの設定
 const firebaseConfig = {
-  apiKey: "AIzaSyAGpB4dwElJQvph-hEZ1Na5ztdE_4Ks0wY",
+  apiKey: "",
   authDomain: "notion-map-1c0f8.firebaseapp.com",
   projectId: "notion-map-1c0f8",
   storageBucket: "notion-map-1c0f8.firebasestorage.app",
