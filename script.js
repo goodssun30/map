@@ -22,9 +22,9 @@ console.log("Firestoreの状態:", db);
 
 // 🔹 ページ読み込み時のデータ復元（Firestoreからデータを取得）
 getDocs(collection(db, "prefectures")).then((querySnapshot) => {
-    querySnapshot.forEach((doc) => {
-        const prefData = doc.data();
-        updateMapColor(doc.id, prefData.status);
+    querySnapshot.forEach((docSnap) => {
+        const prefData = docSnap.data();
+        updateMapColor(docSnap.id, prefData.status);
     });
 });
 
@@ -35,18 +35,10 @@ function getNextStatus(currentStatus) {
     return currentIndex < statusFlow.length - 1 ? statusFlow[currentIndex + 1] : currentStatus;
 }
 
-// 🔹 ページ読み込み時のデータ復元
-getDocs(collection(db, "prefectures")).then((querySnapshot) => {
-    querySnapshot.forEach((docSnap) => {
-        const prefData = docSnap.data();
-        updateMapColor(docSnap.id, prefData.status);
-    });
-});
-
-// 🔹 クリックイベントの処理（修正後）
+// 🔹 クリックイベントの処理
 document.querySelectorAll(".prefecture").forEach((element) => {
     element.addEventListener("click", async () => {
-        const prefCode = element.id; // 例: "pref13"
+        const prefCode = element.id;
         const docRef = doc(db, "prefectures", prefCode);
         const docSnap = await getDoc(docRef);
 
@@ -57,7 +49,7 @@ document.querySelectorAll(".prefecture").forEach((element) => {
     });
 });
 
-// 🔹 Firestoreのデータ更新（修正後）
+// 🔹 Firestoreのデータ更新
 async function updateStatus(prefCode, currentStatus) {
     const nextStatus = getNextStatus(currentStatus);
     const docRef = doc(db, "prefectures", prefCode);
@@ -68,6 +60,7 @@ async function updateStatus(prefCode, currentStatus) {
 
     console.log(`${prefCode} のステータスを ${nextStatus} に更新しました！`);
 }
+
 // 🔹 地図の色変更
 function updateMapColor(prefCode, status) {
     const colorMap = {
@@ -78,28 +71,30 @@ function updateMapColor(prefCode, status) {
     };
     document.getElementById(prefCode).style.fill = colorMap[status];
 }
-document.addEventListener("DOMContentLoaded", function () {
-  const prefectures = document.querySelectorAll("#japan-map rect[id^='pref']");
 
-  prefectures.forEach(pref => {
-    pref.addEventListener("click", function () {
-      if (pref.classList.contains("stayed")) {
-        pref.classList.remove("stayed");
-        pref.classList.add("untouched"); /* ✅ 初期状態（未踏）に戻る */
-        pref.setAttribute("fill", "#ffffff");
-      } else if (pref.classList.contains("pass-through")) {
-        pref.classList.remove("pass-through");
-        pref.classList.add("visited");
-        pref.setAttribute("fill", "#fdd835");
-      } else if (pref.classList.contains("visited")) {
-        pref.classList.remove("visited");
-        pref.classList.add("stayed");
-        pref.setAttribute("fill", "#ef5350");
-      } else {
-        pref.classList.remove("untouched"); /* ✅ 初期状態をリセット */
-        pref.classList.add("pass-through");
-        pref.setAttribute("fill", "#a0d8ef");
-      }
+// 🔹 HTMLのクリックイベント処理
+document.addEventListener("DOMContentLoaded", function () {
+    const prefectures = document.querySelectorAll("#japan-map rect[id^='pref']");
+
+    prefectures.forEach(pref => {
+        pref.addEventListener("click", function () {
+            if (pref.classList.contains("stayed")) {
+                pref.classList.remove("stayed");
+                pref.classList.add("untouched");
+                pref.setAttribute("fill", "#ffffff");
+            } else if (pref.classList.contains("pass-through")) {
+                pref.classList.remove("pass-through");
+                pref.classList.add("visited");
+                pref.setAttribute("fill", "#fdd835");
+            } else if (pref.classList.contains("visited")) {
+                pref.classList.remove("visited");
+                pref.classList.add("stayed");
+                pref.setAttribute("fill", "#ef5350");
+            } else {
+                pref.classList.remove("untouched");
+                pref.classList.add("pass-through");
+                pref.setAttribute("fill", "#a0d8ef");
+            }
+        });
     });
-  });
 });
