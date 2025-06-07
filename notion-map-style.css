@@ -1,0 +1,65 @@
+@charset "UTF-8";
+
+
+/* ✅ 日本地図のスタイル */
+#japan-map {
+  width: 100%;
+  max-width: 640px;
+  border: 1px solid #ccc;
+}
+
+#japan-map rect {
+  fill: #ffffff; /* 未踏（白） */
+  stroke: #999;
+  stroke-width: 1;
+  cursor: pointer;
+  transition: fill 0.3s;
+}
+
+/* ✅ 都道府県の色変更 */
+rect.pass-through { fill: #a0d8ef !important; } /* 通過（青） */
+rect.visited { fill: #fdd835 !important; } /* 訪問（黄色） */
+rect.stayed { fill: #ef5350 !important; } /* 宿泊（赤） */
+rect.untouched { fill: #ffffff !important; } /* ✅ 未踏（白） */
+
+
+
+/* ✅ 凡例のスタイル */
+#legend-group {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: white;
+  padding: 5px;
+  border-radius: 10px;
+  border: 1px solid #333;
+}
+
+/* 凡例内の色ボックス */
+#legend-group rect {
+  stroke: #999;
+  stroke-width: 1;
+  border-radius: 4px;
+}
+
+#legend-group rect:nth-child(2) { fill: #FFFFFF; }  /* 未踏（白） */
+#legend-group rect:nth-child(4) { fill: #a0d8ef; }  /* 通過（青） */
+#legend-group rect:nth-child(6) { fill: #fdd835; }  /* 訪問（黄色） */
+#legend-group rect:nth-child(8) { fill: #ef5350; }  /* 宿泊（赤） */
+
+#legend-group text {
+  font-size: 14px;
+  font-family: Arial, sans-serif;
+  fill: black;
+}
+/* ✅ 都道府県のhoverは有効 */
+#japan-map rect:hover {
+  fill-opacity: 0.7;
+  cursor: pointer;
+}
+
+/* ✅ 凡例のhoverを無効化 */
+#legend-group rect:hover {
+  fill-opacity: 1; /* マウスオーバー時も変化なし */
+  cursor: default; /* 通常のカーソルに変更 */
+}
