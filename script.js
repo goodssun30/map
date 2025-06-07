@@ -16,6 +16,9 @@ const firebaseConfig = {
 // Firebaseの初期化
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
+// 🔹 Firestoreが正しく定義されているか確認！
+console.log("Firestoreの状態:", db);
+
 
 // 🔹 状態変更関数
 function getNextStatus(currentStatus) {
