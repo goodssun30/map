@@ -50,9 +50,10 @@ document.querySelectorAll(".prefecture").forEach((element) => {
 
         if (docSnap.exists()) {
             const currentStatus = docSnap.data().status;
+            console.log(`🔵 クリック前のステータス: ${currentStatus}`);
             updateStatus(prefCode, currentStatus);
         } else {
-            console.warn(`Firestoreのデータが見つかりません: ${prefCode}`);
+            console.warn(`⚠️ Firestoreのデータが見つかりません: ${prefCode}`);
         }
     });
 });
