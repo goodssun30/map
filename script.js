@@ -53,7 +53,7 @@ document.querySelectorAll(".prefecture").forEach((element) => {
             console.log(`🔵 クリック前のステータス: ${currentStatus}`);
             updateStatus(prefCode, currentStatus);
         } else {
-            console.warn(`⚠️ Firestoreのデータが見つかりません: ${prefCode}`);
+            console.warn(`⚠️ Firestore のデータが見つかりません: ${prefCode}`);
         }
     });
 });
@@ -63,6 +63,8 @@ async function updateStatus(prefCode, currentStatus) {
     try {
         const nextStatus = getNextStatus(currentStatus);
         const docRef = doc(db, "prefectures", prefCode);
+
+        console.log(`🔵 現在のステータス: ${currentStatus} → 次のステータス: ${nextStatus}`);
 
         if (nextStatus !== undefined && nextStatus !== null) {
             await updateDoc(docRef, { status: nextStatus });
@@ -79,25 +81,6 @@ async function updateStatus(prefCode, currentStatus) {
         }
     } catch (error) {
         console.error(`🔥 Firestore 書き込みエラー:`, error);
-    }
-}
-
-// 🔹 地図の色変更
-function updateMapColor(prefCode, status) {
-    const colorMap = {
-        "untouched": "#ffffff",
-        "pass-through": "#a0d8ef",
-        "visited": "#fdd835",
-        "stayed": "#ef5350"
-    };
-
-    const element = document.getElementById(prefCode);
-    
-    if (element) {
-        element.style.fill = colorMap[status];
-        console.log(`✅ ${prefCode} の色を変更: ${colorMap[status]}`);
-    } else {
-        console.error(`⚠️ エラー: ${prefCode} の要素が見つかりません！`);
     }
 }
 
