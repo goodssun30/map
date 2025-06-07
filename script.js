@@ -83,6 +83,7 @@ async function updateStatus(prefCode, currentStatus) {
         console.error(`🔥 Firestore 書き込みエラー:`, error);
     }
 }
+
 // 🔹 地図の色変更
 function updateMapColor(prefCode, status) {
     const colorMap = {
@@ -91,7 +92,15 @@ function updateMapColor(prefCode, status) {
         "visited": "#fdd835",
         "stayed": "#ef5350"
     };
-    document.getElementById(prefCode).style.fill = colorMap[status];
+
+    const element = document.getElementById(prefCode);
+    
+    if (element) {
+        element.style.fill = colorMap[status];
+        console.log(`✅ ${prefCode} の色を変更: ${colorMap[status]}`);
+    } else {
+        console.error(`⚠️ エラー: ${prefCode} の要素が見つかりません！`);
+    }
 }
 
 
