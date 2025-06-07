@@ -1,24 +1,32 @@
 "use strict"; // 厳格モードを適用（バグ防止）
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-app.js";
-import { getFirestore } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-firestore.js";
+import { getFirestore, collection, getDocs, getDoc, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-firestore.js";
 
-// Firebaseの設定
+// 🔹 Firebaseの設定
 const firebaseConfig = {
-  apiKey: "AIzaSyAGpB4dwElJQvph-hEZ1Na5ztdE_4Ks0wY",
-  authDomain: "notion-map-1c0f8.firebaseapp.com",
-  projectId: "notion-map-1c0f8",
-  storageBucket: "notion-map-1c0f8.firebasestorage.app",
-  messagingSenderId: "694300884054",
-  appId: "1:694300884054:web:cfe8985cc0c27041f54ff7"
+  apiKey: "YOUR_API_KEY",
+  authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+  projectId: "YOUR_PROJECT_ID",
+  storageBucket: "YOUR_PROJECT_ID.appspot.com",
+  messagingSenderId: "YOUR_SENDER_ID",
+  appId: "YOUR_APP_ID"
 };
 
-// Firebaseの初期化
+// 🔹 Firebaseの初期化
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
-// 🔹 Firestoreが正しく定義されているか確認！
+
+// 🔹 Firestoreの状態確認
 console.log("Firestoreの状態:", db);
 
+// 🔹 ページ読み込み時のデータ復元（Firestoreからデータを取得）
+getDocs(collection(db, "prefectures")).then((querySnapshot) => {
+    querySnapshot.forEach((doc) => {
+        const prefData = doc.data();
+        updateMapColor(doc.id, prefData.status);
+    });
+});
 
 // 🔹 状態変更関数
 function getNextStatus(currentStatus) {
@@ -27,36 +35,33 @@ function getNextStatus(currentStatus) {
     return currentIndex < statusFlow.length - 1 ? statusFlow[currentIndex + 1] : currentStatus;
 }
 
-// 🔹 クリックイベントの処理
+// 🔹 クリックイベントの処理（Firestoreのデータ取得・更新）
 document.querySelectorAll(".prefecture").forEach((element) => {
-    element.addEventListener("click", () => {
+    element.addEventListener("click", async () => {
         const prefCode = element.id; // 例: "pref13"
-        db.collection("prefectures").doc(prefCode).get().then((doc) => {
-            if (doc.exists) {
-                const currentStatus = doc.data().status;
-                updateStatus(prefCode, currentStatus);
-            }
-        });
+        const docRef = doc(db, "prefectures", prefCode);
+        const docSnap = await getDoc(docRef);
+
+        if (docSnap.exists()) {
+            const currentStatus = docSnap.data().status;
+            updateStatus(prefCode, currentStatus);
+        }
     });
 });
 
-function updateStatus(prefCode, currentStatus) {
+// 🔹 Firestoreのデータ更新
+async function updateStatus(prefCode, currentStatus) {
     const nextStatus = getNextStatus(currentStatus);
-    db.collection("prefectures").doc(prefCode).update({
+    const docRef = doc(db, "prefectures", prefCode);
+
+    await updateDoc(docRef, {
         status: nextStatus
-    }).then(() => {
-        console.log(`${prefCode} のステータスを ${nextStatus} に更新しました！`);
     });
+
+    console.log(`${prefCode} のステータスを ${nextStatus} に更新しました！`);
 }
 
-// 🔹 ページ読み込み時のデータ復元
-db.collection("prefectures").get().then((querySnapshot) => {
-    querySnapshot.forEach((doc) => {
-        const prefData = doc.data();
-        updateMapColor(doc.id, prefData.status);
-    });
-});
-
+// 🔹 地図の色変更
 function updateMapColor(prefCode, status) {
     const colorMap = {
         "untouched": "#ffffff",
@@ -66,7 +71,6 @@ function updateMapColor(prefCode, status) {
     };
     document.getElementById(prefCode).style.fill = colorMap[status];
 }
-
 document.addEventListener("DOMContentLoaded", function () {
   const prefectures = document.querySelectorAll("#japan-map rect[id^='pref']");
 
