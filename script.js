@@ -64,9 +64,12 @@ async function updateStatus(prefCode, currentStatus) {
         await updateDoc(docRef, { status: nextStatus });
         console.log(`${prefCode} のステータスを Firestore に保存しました！🚀`);
 
-        // 🔹 Firestore から更新後のデータを取得してチェック
+        // 🔹 更新後のデータを再取得してチェック
         const updatedDoc = await getDoc(docRef);
         console.log(`保存後のデータ確認:`, updatedDoc.data());
+
+        // 🔹 地図の色を変更（ここで実行！）
+        updateMapColor(prefCode, nextStatus);
     } else {
         console.error(`エラー: ${prefCode} のステータスが取得できませんでした！`);
     }
