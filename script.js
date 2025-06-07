@@ -5,12 +5,12 @@ import { getFirestore } from "https://www.gstatic.com/firebasejs/10.0.0/firebase
 
 // Firebaseの設定
 const firebaseConfig = {
-    apiKey: "YOUR_API_KEY",
-    authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-    projectId: "YOUR_PROJECT_ID",
-    storageBucket: "YOUR_PROJECT_ID.appspot.com",
-    messagingSenderId: "YOUR_SENDER_ID",
-    appId: "YOUR_APP_ID"
+  apiKey: "AIzaSyAGpB4dwElJQvph-hEZ1Na5ztdE_4Ks0wY",
+  authDomain: "notion-map-1c0f8.firebaseapp.com",
+  projectId: "notion-map-1c0f8",
+  storageBucket: "notion-map-1c0f8.firebasestorage.app",
+  messagingSenderId: "694300884054",
+  appId: "1:694300884054:web:cfe8985cc0c27041f54ff7"
 };
 
 // Firebaseの初期化
