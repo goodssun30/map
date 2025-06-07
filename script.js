@@ -58,21 +58,25 @@ document.querySelectorAll(".prefecture").forEach((element) => {
 
 // 🔹 Firestoreのデータ更新
 async function updateStatus(prefCode, currentStatus) {
-    const nextStatus = getNextStatus(currentStatus);
-    const docRef = doc(db, "prefectures", prefCode);
+    try {
+        const nextStatus = getNextStatus(currentStatus);
+        const docRef = doc(db, "prefectures", prefCode);
 
-    if (nextStatus !== undefined && nextStatus !== null) {
-        await updateDoc(docRef, { status: nextStatus });
-        console.log(`${prefCode} のステータスを Firestore に保存しました！🚀`);
+        if (nextStatus !== undefined && nextStatus !== null) {
+            await updateDoc(docRef, { status: nextStatus });
+            console.log(`${prefCode} のステータスを Firestore に保存しました！🚀`);
 
-        // 🔹 更新後のデータを再取得してチェック
-        const updatedDoc = await getDoc(docRef);
-        console.log(`保存後のデータ確認:`, updatedDoc.data());
+            // 🔹 更新後のデータを取得して確認
+            const updatedDoc = await getDoc(docRef);
+            console.log(`保存後のデータ確認:`, updatedDoc.data());
 
-        // 🔥 **地図の色を変更**（Firestore の更新後に実行）
-        updateMapColor(prefCode, nextStatus);
-    } else {
-        console.error(`エラー: ${prefCode} のステータスが取得できませんでした！`);
+            // 🔹 地図の色を変更
+            updateMapColor(prefCode, nextStatus);
+        } else {
+            console.error(`エラー: ${prefCode} のステータスが取得できませんでした！`);
+        }
+    } catch (error) {
+        console.error(`🔥 Firestore 書き込みエラー:`, error);
     }
 }
 
