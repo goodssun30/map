@@ -25,9 +25,10 @@ console.log("Firestoreの状態:", db);
 getDocs(collection(db, "prefectures")).then((querySnapshot) => {
     querySnapshot.forEach((docSnap) => {
         if (docSnap.exists()) {
-            console.log("取得したデータ:", docSnap.id, "=>", docSnap.data());
+            const prefData = docSnap.data();
+            updateMapColor(docSnap.id, prefData.status); // 🔥 ここで呼び出す！
         } else {
-            console.error("Firestoreのデータが `undefined` です！");
+            console.warn(`Firestore のデータが見つかりません: ${docSnap.id}`);
         }
     });
 });
@@ -68,7 +69,7 @@ async function updateStatus(prefCode, currentStatus) {
         const updatedDoc = await getDoc(docRef);
         console.log(`保存後のデータ確認:`, updatedDoc.data());
 
-        // 🔹 地図の色を変更（ここで実行！）
+        // 🔥 **地図の色を変更**（Firestore の更新後に実行）
         updateMapColor(prefCode, nextStatus);
     } else {
         console.error(`エラー: ${prefCode} のステータスが取得できませんでした！`);
@@ -83,7 +84,15 @@ function updateMapColor(prefCode, status) {
         "visited": "#fdd835",
         "stayed": "#ef5350"
     };
-    document.getElementById(prefCode).style.fill = colorMap[status];
+
+    const element = document.getElementById(prefCode);
+    
+    if (element) {
+        element.style.fill = colorMap[status];
+        console.log(`✅ ${prefCode} の色を変更: ${colorMap[status]}`);
+    } else {
+        console.error(`⚠️ エラー: ${prefCode} の要素が見つかりません！`);
+    }
 }
 
 // 🔹 HTMLのクリックイベント処理
