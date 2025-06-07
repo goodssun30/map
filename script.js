@@ -26,7 +26,8 @@ getDocs(collection(db, "prefectures")).then((querySnapshot) => {
     querySnapshot.forEach((docSnap) => {
         if (docSnap.exists()) {
             const prefData = docSnap.data();
-            updateMapColor(docSnap.id, prefData.status); // 🔥 ここで呼び出す！
+            updateMapColor(docSnap.id, prefData.status); // 🔥 ページ読み込み時に `status` を反映！
+            console.log(`ロード時のステータス確認:`, prefData.status);
         } else {
             console.warn(`Firestore のデータが見つかりません: ${docSnap.id}`);
         }
@@ -66,7 +67,7 @@ async function updateStatus(prefCode, currentStatus) {
             await updateDoc(docRef, { status: nextStatus });
             console.log(`${prefCode} のステータスを Firestore に保存しました！🚀`);
 
-            // 🔹 更新後のデータを取得して確認
+            // 🔹 Firestore にデータが更新されたか確認！
             const updatedDoc = await getDoc(docRef);
             console.log(`保存後のデータ確認:`, updatedDoc.data());
 
