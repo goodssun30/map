@@ -61,11 +61,12 @@ async function updateStatus(prefCode, currentStatus) {
     const docRef = doc(db, "prefectures", prefCode);
 
     if (nextStatus !== undefined && nextStatus !== null) {
-        await updateDoc(docRef, {
-            status: nextStatus
-        });
+        await updateDoc(docRef, { status: nextStatus });
+        console.log(`${prefCode} のステータスを Firestore に保存しました！🚀`);
 
-        console.log(`${prefCode} のステータスを ${nextStatus} に更新しました！`);
+        // 🔹 Firestore から更新後のデータを取得してチェック
+        const updatedDoc = await getDoc(docRef);
+        console.log(`保存後のデータ確認:`, updatedDoc.data());
     } else {
         console.error(`エラー: ${prefCode} のステータスが取得できませんでした！`);
     }
