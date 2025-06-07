@@ -1,4 +1,63 @@
-"use strict"; // 厳格モードを適用（バグ防止
+"use strict"; // 厳格モードを適用（バグ防止）
+
+// 🔹 Firebaseの設定
+const firebaseConfig = {
+    apiKey: "AIzaSyAGpB4dwElJQvph-hEZ1Na5ztdE_4Ks0wY",
+    authDomain: "notion-map-1c0f8.firebaseapp.com",
+    projectId: "notion-map-1c0f8",
+    storageBucket: "notion-map-1c0f8.firebasestorage.app",
+    messagingSenderId: "694300884054",
+    appId: "1:694300884054:web:cfe8985cc0c27041f54ff7"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+
+// 🔹 状態変更関数
+function getNextStatus(currentStatus) {
+    const statusFlow = ["untouched", "pass-through", "visited", "stayed"];
+    const currentIndex = statusFlow.indexOf(currentStatus);
+    return currentIndex < statusFlow.length - 1 ? statusFlow[currentIndex + 1] : currentStatus;
+}
+
+// 🔹 クリックイベントの処理
+document.querySelectorAll(".prefecture").forEach((element) => {
+    element.addEventListener("click", () => {
+        const prefCode = element.id; // 例: "pref13"
+        db.collection("prefectures").doc(prefCode).get().then((doc) => {
+            if (doc.exists) {
+                const currentStatus = doc.data().status;
+                updateStatus(prefCode, currentStatus);
+            }
+        });
+    });
+});
+
+function updateStatus(prefCode, currentStatus) {
+    const nextStatus = getNextStatus(currentStatus);
+    db.collection("prefectures").doc(prefCode).update({
+        status: nextStatus
+    }).then(() => {
+        console.log(`${prefCode} のステータスを ${nextStatus} に更新しました！`);
+    });
+}
+
+// 🔹 ページ読み込み時のデータ復元
+db.collection("prefectures").get().then((querySnapshot) => {
+    querySnapshot.forEach((doc) => {
+        const prefData = doc.data();
+        updateMapColor(doc.id, prefData.status);
+    });
+});
+
+function updateMapColor(prefCode, status) {
+    const colorMap = {
+        "untouched": "#ffffff",
+        "pass-through": "#a0d8ef",
+        "visited": "#fdd835",
+        "stayed": "#ef5350"
+    };
+    document.getElementById(prefCode).style.fill = colorMap[status];
+}
 
 document.addEventListener("DOMContentLoaded", function () {
   const prefectures = document.querySelectorAll("#japan-map rect[id^='pref']");
