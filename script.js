@@ -65,16 +65,16 @@ async function updateStatus(prefCode, currentStatus) {
 
         if (nextStatus !== undefined && nextStatus !== null) {
             await updateDoc(docRef, { status: nextStatus });
-            console.log(`${prefCode} のステータスを Firestore に保存しました！🚀`);
+            console.log(`✅ ${prefCode} のステータスを Firestore に保存しました！🚀`);
 
-            // 🔹 Firestore にデータが更新されたか確認！
+            // 🔹 Firestore に保存されたデータを取得してチェック
             const updatedDoc = await getDoc(docRef);
-            console.log(`保存後のデータ確認:`, updatedDoc.data());
+            console.log(`🔥 Firestore に保存後のデータ確認:`, updatedDoc.data());
 
             // 🔹 地図の色を変更
             updateMapColor(prefCode, nextStatus);
         } else {
-            console.error(`エラー: ${prefCode} のステータスが取得できませんでした！`);
+            console.error(`⚠️ エラー: ${prefCode} のステータスが取得できませんでした！`);
         }
     } catch (error) {
         console.error(`🔥 Firestore 書き込みエラー:`, error);
