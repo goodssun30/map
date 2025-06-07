@@ -64,8 +64,6 @@ async function updateStatus(prefCode, currentStatus) {
         const nextStatus = getNextStatus(currentStatus);
         const docRef = doc(db, "prefectures", prefCode);
 
-        console.log(`🔵 現在のステータス: ${currentStatus} → 次のステータス: ${nextStatus}`);
-
         if (nextStatus !== undefined && nextStatus !== null) {
             await updateDoc(docRef, { status: nextStatus });
             console.log(`✅ ${prefCode} のステータスを Firestore に保存しました！🚀`);
@@ -74,8 +72,12 @@ async function updateStatus(prefCode, currentStatus) {
             const updatedDoc = await getDoc(docRef);
             console.log(`🔥 Firestore に保存後のデータ確認:`, updatedDoc.data());
 
-            // 🔹 地図の色を変更
-            updateMapColor(prefCode, nextStatus);
+            // 🔥 **ここで `updateMapColor()` を確認して実行**
+            if (typeof updateMapColor === "function") {
+                updateMapColor(prefCode, nextStatus);
+            } else {
+                console.error("⚠️ `updateMapColor` が定義されていません！");
+            }
         } else {
             console.error(`⚠️ エラー: ${prefCode} のステータスが取得できませんでした！`);
         }
@@ -83,7 +85,6 @@ async function updateStatus(prefCode, currentStatus) {
         console.error(`🔥 Firestore 書き込みエラー:`, error);
     }
 }
-
 // 🔹 地図の色変更
 function updateMapColor(prefCode, status) {
     const colorMap = {
