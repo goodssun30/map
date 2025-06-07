@@ -146,11 +146,25 @@
  <!-- ページの内容（地図やボタンなど） -->
 
     <!-- Firebaseのスクリプトを先に読み込む -->
-    <script src="https://www.gstatic.com/firebasejs/10.0.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.0.0/firebase-firestore.js"></script>
+    <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-app.js";
+    import { getFirestore } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+  apiKey: "AIzaSyAGpB4dwElJQvph-hEZ1Na5ztdE_4Ks0wY",
+  authDomain: "notion-map-1c0f8.firebaseapp.com",
+  projectId: "notion-map-1c0f8",
+  storageBucket: "notion-map-1c0f8.firebasestorage.app",
+  messagingSenderId: "694300884054",
+  appId: "1:694300884054:web:cfe8985cc0c27041f54ff7"
+};
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+</script>
+
 
     <!-- JavaScriptファイル（`script.js`）を最後に読み込む -->
-    <script src="script.js"></script>
-
+    <script type="module" src="script.js"></script>
 </body>
 </html>
