@@ -25,10 +25,9 @@ console.log("Firestoreの状態:", db);
 getDocs(collection(db, "prefectures")).then((querySnapshot) => {
     querySnapshot.forEach((docSnap) => {
         if (docSnap.exists()) {
-            const prefData = docSnap.data();
-            updateMapColor(docSnap.id, prefData.status);
+            console.log("取得したデータ:", docSnap.id, "=>", docSnap.data());
         } else {
-            console.warn(`データが見つかりません: ${docSnap.id}`);
+            console.error("Firestoreのデータが `undefined` です！");
         }
     });
 });
@@ -61,11 +60,15 @@ async function updateStatus(prefCode, currentStatus) {
     const nextStatus = getNextStatus(currentStatus);
     const docRef = doc(db, "prefectures", prefCode);
 
-    await updateDoc(docRef, {
-        status: nextStatus
-    });
+    if (nextStatus !== undefined && nextStatus !== null) {
+        await updateDoc(docRef, {
+            status: nextStatus
+        });
 
-    console.log(`${prefCode} のステータスを ${nextStatus} に更新しました！`);
+        console.log(`${prefCode} のステータスを ${nextStatus} に更新しました！`);
+    } else {
+        console.error(`エラー: ${prefCode} のステータスが取得できませんでした！`);
+    }
 }
 
 // 🔹 地図の色変更
