@@ -43,9 +43,9 @@ rect.untouched { fill: #ffffff !important; } /* ✅ 未踏（白） */
 }
 
 #legend-group rect:nth-child(2) { fill: #FFFFFF; }  /* 未踏（白） */
-#legend-group rect:nth-child(4) { fill: #a0d8ef; }  /* 通過（青） */
-#legend-group rect:nth-child(6) { fill: #fdd835; }  /* 訪問（黄色） */
-#legend-group rect:nth-child(8) { fill: #ef5350; }  /* 宿泊（赤） */
+#legend-group rect:nth-child(4) { fill: #a6e0f7; }  /* 通過（青） */
+#legend-group rect:nth-child(6) { fill: #fae070; }  /* 訪問（黄色） */
+#legend-group rect:nth-child(8) { fill: #fc7472; }  /* 宿泊（赤） */
 
 #legend-group text {
   font-size: 14px;
