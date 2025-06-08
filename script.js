@@ -90,7 +90,7 @@ function updateMapColor(prefCode, status) {
 
 // 🔹 クリックイベント処理
 document.addEventListener("DOMContentLoaded", function () {
-    const prefectures = document.querySelectorAll("#japan-map rect[id^='pref']");
+    const prefectures = document.querySelectorAll("#map-body rect[id^='pref']");
 
     prefectures.forEach(pref => {
         pref.addEventListener("click", async function () {
