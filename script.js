@@ -82,9 +82,9 @@ async function updateStatus(prefCode, currentStatus) {
 function updateMapColor(prefCode, status) {
     const colorMap = {
         "untouched": "#ffffff",
-        "pass-through": "#a0d8ef",
-        "visited": "#fdd835",
-        "stayed": "#ef5350"
+        "pass-through": "#a6e0f7",
+        "visited": "#fae070",
+        "stayed": "#fc7472"
     };
 
     const element = document.getElementById(prefCode);
