@@ -6,7 +6,7 @@ import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/1
 
 // 🔹 Firebaseの設定
 const firebaseConfig = {
-  apiKey: "AIzaSyAGpB4dwElJQvph-hEZ1Na5ztdE_4Ks0wY",
+  apiKey: "", // APIキーはセキュリティに注意して設定してください
   authDomain: "notion-map-1c0f8.firebaseapp.com",
   projectId: "notion-map-1c0f8",
   storageBucket: "notion-map-1c0f8.firebasestorage.app",
@@ -17,9 +17,60 @@ const firebaseConfig = {
 // 🔹 Firebaseの初期化
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
-const auth = getAuth(app);
+const auth = getAuth();
 
-// 🔹 匿名ログインしてからFirestore操作を始める関数
+// 🔹 状態変更関数
+function getNextStatus(currentStatus) {
+  switch (currentStatus) {
+    case "untouched":
+      return "pass-through";
+    case "pass-through":
+      return "visited";
+    case "visited":
+      return "stayed";
+    case "stayed":
+      return "untouched"; // ここがループのキー
+    default:
+      return "untouched";
+  }
+}
+
+// 🔹 地図の色変更
+function updateMapColor(prefCode, status) {
+  const colorMap = {
+    "untouched": "#ffffff",
+    "pass-through": "#a6e0f7",
+    "visited": "#fae070",
+    "stayed": "#fc7472"
+  };
+
+  const element = document.getElementById(prefCode);
+
+  if (element) {
+    element.style.fill = colorMap[status];
+    console.log(`✅ ${prefCode} の色を変更: ${colorMap[status]}`);
+  } else {
+    console.error(`⚠️ エラー: ${prefCode} の要素が見つかりません！`);
+  }
+}
+
+// 🔹 Firestoreのデータ更新関数
+async function updateStatus(prefCode, currentStatus) {
+  try {
+    const nextStatus = getNextStatus(currentStatus);
+    const docRef = doc(db, "prefectures", prefCode);
+
+    await updateDoc(docRef, { status: nextStatus });
+    console.log(`✅ ${prefCode} のステータスを Firestore に保存しました！🚀`);
+
+    // 地図の色を変更
+    updateMapColor(prefCode, nextStatus);
+  } catch (error) {
+    console.error(`🔥 Firestore 書き込みエラー:`, error);
+  }
+}
+
+// 🔹 Firestore読み込み＆イベント設定関数（認証後に呼ぶ）
 function startFirestoreLogic() {
   // ページ読み込み時のデータ復元
   getDocs(collection(db, "prefectures")).then((querySnapshot) => {
@@ -34,62 +85,29 @@ function startFirestoreLogic() {
     });
   });
 
-  // クリックイベント処理
+  // クリックイベント登録
   const prefectures = document.querySelectorAll("#map-body rect[id^='pref']");
   prefectures.forEach(pref => {
-    pref.addEventListener("click", async function () {
+    pref.addEventListener("click", async () => {
       const prefCode = pref.id;
       const docRef = doc(db, "prefectures", prefCode);
       const docSnap = await getDoc(docRef);
 
       if (docSnap.exists()) {
         const currentStatus = docSnap.data().status;
-        const nextStatus = getNextStatus(currentStatus);
-        await updateDoc(docRef, { status: nextStatus });
-        updateMapColor(prefCode, nextStatus);
+        await updateStatus(prefCode, currentStatus);
+      } else {
+        console.warn(`クリックした ${prefCode} のデータがFirestoreにありません`);
       }
     });
   });
 }
 
-// 🔹 状態変更関数
-function getNextStatus(currentStatus) {
-  switch (currentStatus) {
-    case "untouched":
-      return "pass-through";
-    case "pass-through":
-      return "visited";
-    case "visited":
-      return "stayed";
-    case "stayed":
-      return "untouched";
-    default:
-      return "untouched";
-  }
-}
-
-// 🔹 地図の色変更
-function updateMapColor(prefCode, status) {
-  const colorMap = {
-    "untouched": "#ffffff",
-    "pass-through": "#a6e0f7",
-    "visited": "#fae070",
-    "stayed": "#fc7472"
-  };
-  const element = document.getElementById(prefCode);
-  if (element) {
-    element.style.fill = colorMap[status];
-    console.log(`✅ ${prefCode} の色を変更: ${colorMap[status]}`);
-  } else {
-    console.error(`⚠️ エラー: ${prefCode} の要素が見つかりません！`);
-  }
-}
-
-// 🔹 匿名ログイン実行
+// 🔹 匿名ログインしてからFirestore処理を開始
 signInAnonymously(auth)
   .then(() => {
     console.log("匿名ログイン成功");
-    startFirestoreLogic();  // 匿名ログイン成功したらFirestore処理を開始
+    startFirestoreLogic();
   })
   .catch((error) => {
     console.error("匿名ログイン失敗:", error);
