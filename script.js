@@ -1,10 +1,10 @@
-"use strict"; // 厳格モードを適用（バグ防止）
+"use strict";
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-app.js";
 import { getFirestore, collection, getDocs, getDoc, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-firestore.js";
 import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-auth.js";
 
-// 🔹 Firebaseの設定
+// 🔹 Firebase設定
 const firebaseConfig = {
   apiKey: "AIzaSyAGpB4dwElJQvph-hEZ1Na5ztdE_4Ks0wY",
   authDomain: "notion-map-1c0f8.firebaseapp.com",
@@ -14,28 +14,35 @@ const firebaseConfig = {
   appId: "1:694300884054:web:cfe8985cc0c27041f54ff7"
 };
 
-// 🔹 Firebaseの初期化
+// 🔹 Firebase初期化
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
-const auth = getAuth();
+const auth = getAuth(app);
 
-// 🔹 状態変更関数
+// 🔹 匿名ログインしてから Firestore 処理を開始
+signInAnonymously(auth)
+  .then(() => {
+    console.log("✅ 匿名ログイン成功");
+    console.log("あなたのUIDは：", auth.currentUser.uid);
+
+    startFirestoreLogic();  // ログイン成功後にマップ処理をスタート
+  })
+  .catch((error) => {
+    console.error("匿名ログイン失敗:", error);
+  });
+
+// 🔹 ステータスの次を返す関数
 function getNextStatus(currentStatus) {
   switch (currentStatus) {
-    case "untouched":
-      return "pass-through";
-    case "pass-through":
-      return "visited";
-    case "visited":
-      return "stayed";
-    case "stayed":
-      return "untouched"; // ここがループのキー
-    default:
-      return "untouched";
+    case "untouched": return "pass-through";
+    case "pass-through": return "visited";
+    case "visited": return "stayed";
+    case "stayed": return "untouched";
+    default: return "untouched";
   }
 }
 
-// 🔹 地図の色変更
+// 🔹 マップの色をステータスに合わせて変える
 function updateMapColor(prefCode, status) {
   const colorMap = {
     "untouched": "#ffffff",
@@ -45,34 +52,31 @@ function updateMapColor(prefCode, status) {
   };
 
   const element = document.getElementById(prefCode);
-
   if (element) {
-    element.style.fill = colorMap[status];
+    element.style.fill = colorMap[status] || "#ffffff";
     console.log(`✅ ${prefCode} の色を変更: ${colorMap[status]}`);
   } else {
-    console.error(`⚠️ エラー: ${prefCode} の要素が見つかりません！`);
+    console.error(`⚠️ ${prefCode} の要素が見つかりません！`);
   }
 }
 
-// 🔹 Firestoreのデータ更新関数
+// 🔹 Firestoreのステータス更新＆色変更
 async function updateStatus(prefCode, currentStatus) {
   try {
     const nextStatus = getNextStatus(currentStatus);
     const docRef = doc(db, "prefectures", prefCode);
-
     await updateDoc(docRef, { status: nextStatus });
-    console.log(`✅ ${prefCode} のステータスを Firestore に保存しました！🚀`);
+    console.log(`✅ ${prefCode} のステータスを Firestore に保存しました！`);
 
-    // 地図の色を変更
     updateMapColor(prefCode, nextStatus);
   } catch (error) {
-    console.error(`🔥 Firestore 書き込みエラー:`, error);
+    console.error("Firestore 書き込みエラー:", error);
   }
 }
 
-// 🔹 Firestore読み込み＆イベント設定関数（認証後に呼ぶ）
+// 🔹 ページ読み込み後＆クリックイベント登録
 function startFirestoreLogic() {
-  // ページ読み込み時のデータ復元
+  // 1. ページ読み込み時に Firestore からステータス読み込み＆色反映
   getDocs(collection(db, "prefectures")).then((querySnapshot) => {
     querySnapshot.forEach((docSnap) => {
       if (docSnap.exists()) {
@@ -85,7 +89,7 @@ function startFirestoreLogic() {
     });
   });
 
-  // クリックイベント登録
+  // 2. 地図の県ごとにクリックイベントを付ける
   const prefectures = document.querySelectorAll("#map-body rect[id^='pref']");
   prefectures.forEach(pref => {
     pref.addEventListener("click", async () => {
@@ -97,18 +101,8 @@ function startFirestoreLogic() {
         const currentStatus = docSnap.data().status;
         await updateStatus(prefCode, currentStatus);
       } else {
-        console.warn(`クリックした ${prefCode} のデータがFirestoreにありません`);
+        console.warn(`${prefCode} のデータがありません`);
       }
     });
   });
 }
-
-// 🔹 匿名ログインしてからFirestore処理を開始
-signInAnonymously(auth)
-  .then(() => {
-    console.log("匿名ログイン成功");
-    startFirestoreLogic();
-  })
-  .catch((error) => {
-    console.error("匿名ログイン失敗:", error);
-  });
