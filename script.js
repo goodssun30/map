@@ -35,14 +35,21 @@ getDocs(collection(db, "prefectures")).then((querySnapshot) => {
 });
 
 // 🔹 状態変更関数
-// 🔹 状態変更関数（ループ対応版）
 function getNextStatus(currentStatus) {
-    const statusFlow = ["untouched", "pass-through", "visited", "stayed"]; // 🔥 順番を維持
-    const currentIndex = statusFlow.indexOf(currentStatus);
-    
-    // 🔥 最後のステータスなら最初に戻る！
-    return currentIndex < statusFlow.length - 1 ? statusFlow[currentIndex + 1] : statusFlow[0];
+    switch (currentStatus) {
+        case "untouched":
+            return "pass-through";
+        case "pass-through":
+            return "visited";
+        case "visited":
+            return "stayed";
+        case "stayed":
+            return "untouched"; // ← これが重要！！
+        default:
+            return "untouched";
+    }
 }
+
 
 // 🔹 Firestoreのデータ更新
 async function updateStatus(prefCode, currentStatus) {
