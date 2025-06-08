@@ -17,9 +17,9 @@
 }
 
 /* ✅ 都道府県の色変更 */
-rect.pass-through { fill: #a0d8ef !important; } /* 通過（青） */
-rect.visited { fill: #fdd835 !important; } /* 訪問（黄色） */
-rect.stayed { fill: #ef5350 !important; } /* 宿泊（赤） */
+rect.pass-through { fill: #a6e0f7 !important; } /* 通過（青） */
+rect.visited { fill: #fae070 !important; } /* 訪問（黄色） */
+rect.stayed { fill: #fc7472 !important; } /* 宿泊（赤） */
 rect.untouched { fill: #ffffff !important; } /* ✅ 未踏（白） */
 
 
