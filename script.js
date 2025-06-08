@@ -6,7 +6,7 @@ import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/1
 
 // 🔹 Firebaseの設定
 const firebaseConfig = {
-  apiKey: "", // APIキーはセキュリティに注意して設定してください
+  apiKey: "AIzaSyAGpB4dwElJQvph-hEZ1Na5ztdE_4Ks0wY", // APIキーはセキュリティに注意して設定してください
   authDomain: "notion-map-1c0f8.firebaseapp.com",
   projectId: "notion-map-1c0f8",
   storageBucket: "notion-map-1c0f8.firebasestorage.app",
