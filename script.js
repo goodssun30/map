@@ -41,28 +41,6 @@ function getNextStatus(currentStatus) {
     return currentIndex < statusFlow.length - 1 ? statusFlow[currentIndex + 1] : currentStatus;
 }
 
-// 🔹 クリックイベントの処理
-document.querySelectorAll(".prefecture").forEach((element) => {
-    element.addEventListener("click", async () => {
-        const prefCode = element.id;
-        const docRef = doc(db, "prefectures", prefCode);
-        const docSnap = await getDoc(docRef);
-
-        if (docSnap.exists()) {
-            console.log(`✅ Firestore の現在のステータス:`, docSnap.data().status); // 🔥 ここで追加！
-            const currentStatus = docSnap.data().status;
-            
-            const nextStatus = getNextStatus(currentStatus);
-            await updateDoc(docRef, { status: nextStatus });
-
-            console.log(`✅ Firestore に保存したステータス: ${nextStatus}`); // 🔥 変更後の確認！
-            updateMapColor(prefCode, nextStatus);
-        } else {
-            console.warn(`⚠️ Firestore のデータが見つかりません: ${prefCode}`);
-        }
-    });
-});
-
 // 🔹 Firestoreのデータ更新
 async function updateStatus(prefCode, currentStatus) {
     try {
@@ -110,28 +88,25 @@ function updateMapColor(prefCode, status) {
 }
 
 
-// 🔹 HTMLのクリックイベント処理
+// 🔹 クリックイベント処理
 document.addEventListener("DOMContentLoaded", function () {
     const prefectures = document.querySelectorAll("#japan-map rect[id^='pref']");
 
     prefectures.forEach(pref => {
-        pref.addEventListener("click", function () {
-            if (pref.classList.contains("stayed")) {
-                pref.classList.remove("stayed");
-                pref.classList.add("untouched");
-                pref.setAttribute("fill", "#ffffff");
-            } else if (pref.classList.contains("pass-through")) {
-                pref.classList.remove("pass-through");
-                pref.classList.add("visited");
-                pref.setAttribute("fill", "#fdd835");
-            } else if (pref.classList.contains("visited")) {
-                pref.classList.remove("visited");
-                pref.classList.add("stayed");
-                pref.setAttribute("fill", "#ef5350");
-            } else {
-                pref.classList.remove("untouched");
-                pref.classList.add("pass-through");
-                pref.setAttribute("fill", "#a0d8ef");
+        pref.addEventListener("click", async function () {
+            const prefCode = pref.id;
+            const docRef = doc(db, "prefectures", prefCode);
+            const docSnap = await getDoc(docRef);
+
+            if (docSnap.exists()) {
+                const currentStatus = docSnap.data().status;
+                const nextStatus = getNextStatus(currentStatus);
+
+                // Firestoreに保存
+                await updateDoc(docRef, { status: nextStatus });
+
+                // 色を変更
+                updateMapColor(prefCode, nextStatus);
             }
         });
     });
